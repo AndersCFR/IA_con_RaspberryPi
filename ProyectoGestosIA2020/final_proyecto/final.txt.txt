@@ -1,0 +1,44 @@
+import numpy as np
+import cv2
+import time
+from keras.preprocessing.image import load_img, img_to_array
+from keras.models import load_model
+
+
+modelo_entrenado = './modelo/modelo.h5'
+pesos = './modelo/pesos.h5'
+cnn = load_model(modelo_entrenado)
+cnn.load_weights(pesos)
+dsize = (100,100)
+
+
+def predict(file):
+    flag = False
+    x=load_img(file, target_size=(longitud, altura))
+    x=img_to_array(x)
+    x=np.expand_dims(x,axis=0)
+    arreglo = cnn.predict(x) #[1,0,0]
+    
+    resultado=arreglo[0] 
+    #print('Arreglo :',type(resultado),'  ', arreglo)
+
+    for i in range(0,3):
+        #print(' - ',i,' - ',resultado[i])
+        if resultado[i]>0.7:
+            flag=True
+           
+    if flag==True:        
+        respuesta = np.argmax(resultado)
+        if respuesta==0:
+            print("Papel")
+        elif respuesta == 1:
+            print("Roca")
+        elif respuesta == 2:
+            print("Tijera")
+    else:
+        respuesta=3
+        print("Nada")
+    return respuesta
+
+
+predict('dataset_imagenes/probando/web1.jpg')
